@@ -166,3 +166,15 @@ class DoublyLinkedList:
             p = q
             q = q.prev
         self.start_node = p
+
+class CircularDoublyLinkedList(DoublyLinkedList):
+    """ 
+    A circular doubly linked list is just a doubly linked list where we take
+    care to make sure the 'last' node in the list points back to the head.
+    A naive approach could be to check this condition after every operation
+    i.e. the head.prev should point to the 'last' element, and there should be
+    no empty pointers traversing the list in either direction.  This would be
+    a pretty silly way to do it though, picking up an extra O(n) operation for
+    things that don't need it.  
+    """
+

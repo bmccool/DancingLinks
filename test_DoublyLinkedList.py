@@ -1,4 +1,4 @@
-from dlx import DoublyLinkedList
+from DoublyLinkedList import DoublyLinkedList
 
 def test_DLL_insert_in_empty_list():
     new_linked_list = DoublyLinkedList()
