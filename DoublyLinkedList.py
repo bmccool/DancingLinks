@@ -177,4 +177,38 @@ class CircularDoublyLinkedList(DoublyLinkedList):
     a pretty silly way to do it though, picking up an extra O(n) operation for
     things that don't need it.  
     """
+    def insert_in_emptylist(self, data):
+        super().insert_in_emptylist(data)
+        self.start_node.next = start_node
+        self.start_node.prev = start_node
+
+    def insert_at_start(self, data):
+        last_node = self.start_node.prev
+        super().insert_at_start(data)
+        self.start_node.prev = last_node
+
+    def insert_at_end(self, data):
+        last_node = self.start_node.prev
+        super().insert_at_end(data)
+        self.start_node.prev = last_node.next
+
+    def insert_after_item(self, x, data):
+        super().insert_after_item(x, data)
+        #Scenarios:
+        #1: We didn't insert anything, head and tail didn't change
+        #2: We inserted in the middle, head and tail didn't change
+        #3: We inserted after the first item, head and tail didn't change (more than 1 item in the list)
+        #4: We inserted after the last item, tail changed to the new item (this covers #3 with only 1 item)
+        # So we really only need to check for scenario 4
+        if self.start_node.prev.next == self.start_node:
+            # If the current tail still points to the head, do nothing
+            pass
+        else:
+            new_tail = self.start_node.prev.next.next
+            # We have inserted after the old tail,
+            # Update the new tail to point back to the head
+            new_tail.next = self.start_node
+            #Update the head to point to the new tail
+            self.start_node.prev = new_tail
+
 
