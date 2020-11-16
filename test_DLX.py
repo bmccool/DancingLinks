@@ -198,3 +198,7 @@ def test_DLX_search_fig_2(fig_2):
     assert fig_2.solution[0] == ["A", "D"]
     assert fig_2.solution[1] == ["E", "F", "C"]
     assert fig_2.solution[2] == ["B", "G"]
+    # This shows that fig 2 has an exact cover with:
+    #    Row 4(A,D)
+    #    Row 1(C, E, F)
+    #    Row 5(B, G)
