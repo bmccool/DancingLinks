@@ -39,7 +39,7 @@ def check_row(matrix: ColumnObject, labels, depth):
             assert header_index.C.N == label
             header_index = header_index.L
 
-def test_fig_2_creation(fig_2):
+def check_fig_2_whole(fig_2: ColumnObject):
     # Check Labels (names)
     header_index = fig_2.root
     row = [header_index.N] # Get the first one
@@ -67,27 +67,9 @@ def test_fig_2_creation(fig_2):
     # Check Row 5
     check_row(fig_2, ['B', 'G'], 2)
     # Check Row 6
-    check_row(fig_2, ['D', 'E', 'G'], 3)
+    check_row(fig_2, ['D', 'E', 'G'], 3)    
 
-def test_fig_2_removal(fig_2):
-    header_index = fig_2.root
-
-    # Remove header A horiz
-    header_index = header_index.R
-    fig_2.remove(header_index)
-    
-    # From A, down, right, remove vert
-    header_index = header_index.D.R
-    fig_2.remove(header_index, False)
-
-    # From there, right, remove vert
-    header_index = header_index.R
-    fig_2.remove(header_index, False)
-
-    # From A, down, down, right, remove vert
-    header_index = header_index.R.D.R
-    fig_2.remove(header_index, False)
-
+def check_fig_2_cover_a(fig_2: ColumnObject):
     # Check Labels (names)
     header_index = fig_2.root
     row = [header_index.N] # Get the first one
@@ -102,7 +84,7 @@ def test_fig_2_removal(fig_2):
     while header_index.R != fig_2.root:
         header_index = header_index.R
         row.append(header_index.S)
-    assert row == [7, 2, 2, 3, 2, 2, 3]
+    assert row == [6, 2, 2, 1, 2, 2, 2]
 
     # Check Row 1
     check_row(fig_2, ['C', 'E', 'F'], 1)
@@ -116,3 +98,103 @@ def test_fig_2_removal(fig_2):
     check_row(fig_2, ['B', 'G'], 2)
     # Check Row 6
     check_row(fig_2, ['D', 'E', 'G'], 1)    
+
+def test_fig_2_creation(fig_2):
+    check_fig_2_whole(fig_2)
+
+def test_fig_2_removal(fig_2):
+    header_index = fig_2.root
+
+    # Remove header A horiz
+    header_index = header_index.R
+    header_index.remove()
+    
+    # From A, down, right, remove vert
+    header_index = header_index.D.R
+    header_index.remove()
+
+    # From there, right, remove vert
+    header_index = header_index.R
+    header_index.remove()
+
+    # From A, down, down, right, remove vert
+    header_index = header_index.R.D.R
+    header_index.remove()
+
+    check_fig_2_cover_a(fig_2)
+
+def test_fig_2_restore(fig_2):
+    remove_index = fig_2.root
+
+    # Remove header A horiz
+    remove_index = remove_index.R
+    remove_index.remove()
+    
+    # From A, down, right, remove vert
+    remove_index = remove_index.D.R
+    remove_index.remove()
+
+    # From there, right, remove vert
+    remove_index = remove_index.R
+    remove_index.remove()
+
+    # From A, down, down, right, remove vert
+    remove_index = remove_index.R.D.R
+    remove_index.remove()
+
+    check_fig_2_cover_a(fig_2)
+
+    # Restore in reverse order...
+    restore_index = remove_index
+
+    #header_index = header_index.R.D.R
+    #fig_2.remove(header_index, False)
+    restore_index.restore()
+    restore_index = restore_index.L.U.L
+
+    #header_index = header_index.R
+    #fig_2.remove(header_index, False)
+    restore_index.restore()
+    restore_index = restore_index.L
+
+    #header_index = header_index.D.R
+    #fig_2.remove(header_index, False)
+    restore_index.restore()
+    restore_index = restore_index.L.U
+
+    # Remove header A horiz
+    #header_index = header_index.R
+    #fig_2.remove(header_index)
+    restore_index.restore()
+    remove_index = remove_index.L # Just point back to root at this point
+    
+    check_fig_2_whole(fig_2)
+
+def test_DLX_cover_fig_2(fig_2):
+    header_index = fig_2.root
+
+    # Cover Column A
+    header_index = header_index.R
+    header_index.cover()
+
+    check_fig_2_cover_a(fig_2)
+
+def test_DLX_uncover_fig_2(fig_2):
+    header_index = fig_2.root
+
+    # Cover Column A
+    column_a = header_index.R
+    column_a.cover()
+
+    check_fig_2_cover_a(fig_2)  
+
+    # Uncover Column A
+    column_a.uncover()
+
+    check_fig_2_whole(fig_2)
+
+def test_DLX_search_fig_2(fig_2):
+    fig_2.search(0)
+    assert fig_2.solution[0] == ["A", "D"]
+    assert fig_2.solution[1] == ["E", "F", "C"]
+    assert fig_2.solution[2] == ["B", "G"]

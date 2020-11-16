@@ -335,7 +335,17 @@ class DataObject:
         self.R = None # Right
         self.U = None # Up
         self.D = None # Down
-        self.C = None # The C field of each object points to the column object at the head of the relevant column.
+        self.C = None # The C field of each object points to the column header at the head of the relevant column.
+
+    def remove(self):
+        self.U.D = self.D
+        self.D.U = self.U
+        self.C.S = self.C.S - 1
+
+    def restore(self):
+        self.U.D = self
+        self.D.U = self
+        self.C.S = self.C.S + 1
 
 class ColumnHeader(DataObject):
     def __init__(self):
@@ -344,6 +354,48 @@ class ColumnHeader(DataObject):
         # And two additional fields
         self.S = None #Size, Number of 1s in this column
         self.N = None #Name, symbolic identifies for printing answers
+
+    def remove(self):
+        self.R.L = self.L
+        self.L.R = self.R
+        self.C.S = self.C.S - 1
+
+    def restore(self):
+        self.R.L = self
+        self.L.R = self
+        self.C.S = self.C.S + 1
+
+    def cover(self):
+        # Remove this header
+        self.remove()
+        index = self
+        index = index.D
+        # For each DataObject in this column, remove all it's R peers, 
+        # but NOT the one in this column
+        while index != self:
+            #this is a new row, remove all it's R peers
+            column = index
+            index = index.R
+            while index != column:
+                index.remove()
+                index = index.R
+            index = index.D
+
+    def uncover(self):
+        # Remove this header
+        self.restore()
+        index = self
+        index = index.U
+        # For each DataObject in this column, restore all it's L peers, 
+        # but NOT the one in this column
+        while index != self:
+            #this is a new row, restore all it's L peers
+            column = index
+            index = index.L
+            while index != column:
+                index.restore()
+                index = index.L
+            index = index.U        
 
 class ColumnObject():
     #Contains All List Headers
@@ -355,22 +407,20 @@ class ColumnObject():
         self.root.N = 'h'
         self.root.L = self.root
         self.root.R = self.root
+        self.O = []
+        self.solution = None
 
-    def remove(self, node: DataObject, horizontal=True):
-        if horizontal:
-            node.R.L = node.L
-            node.L.R = node.R
-        else:
-            node.U.D = node.D
-            node.D.U = node.U
-        #TODO, probaly should put this operation on a stack or something?
-
-
-
-    #def restore(node: DataObject):
-
-    #def cover(column: ColumnHeader):
-
+    def print_solution(self):
+        rows = []
+        for O in self.O:
+            columns = [O.C.N]
+            i = O.R
+            while i != O:
+                columns.append(i.C.N)
+                i = i.R
+            print(columns)
+            rows.append(columns)
+        self.solution = rows
 
     def search(self, k):
         """
@@ -380,7 +430,7 @@ class ColumnObject():
         """
         # If R[h] = h, print the current solution (see below) and return.
         if self.root.R == self.root:
-            #TODO print the solution
+            self.print_solution()
             return
         
         # Find the column c with the least number of 1s (smallest size (S))
@@ -393,8 +443,43 @@ class ColumnObject():
         
         # c is now the ColumnHeader with the least 1s
         # Cover column c ...
+        c.cover()
 
+        # For each r ← D[c], D[D[c]], . . . , while r != c,
+        r = c.D
+        while r != c:
+            # set Ok ← r;
+            try:
+                self.O[k] = r
+            except:
+                self.O.append(r)
 
+            # for each j ← R[r], R[R[r]], . . . , while j != r,
+            j = r.R
+            while j != r:
+                # cover column j (see below);
+                j.C.cover()
+                j = j.R
+
+            # search(k + 1);
+            self.search(k + 1)
+
+            # set r ← Ok and c ← C[r];
+            # TODO, these should already be set, right?
+            r = self.O[k]
+            c = r.C
+
+            # for each j ← L[r], L[L[r]], . . . , while j != r,
+            j = r.L
+            while j != r:
+                # uncover column j (see below).
+                j.C.uncover()
+                j = j.L
+
+            r = r.D
+
+        #Uncover column c (see below) and return.
+        c.uncover()
 
     # In this context, a row represents a subset that can be part of the solution
     # We will focus on adding rows, because a single row has meaning, whereas a single
@@ -443,6 +528,7 @@ class ColumnObject():
         new_header = ColumnHeader()
         new_header.R = self.root
         new_header.L = self.root.L
+        new_header.C = self.root # Just a helper to point all headers to root
         self.root.L.R = new_header
         self.root.L = new_header
 

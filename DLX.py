@@ -1,6 +1,6 @@
-from DoublyLinkedList import CircularDoublyLinkedList
+from DoublyLinkedList import ColumnObject
 
-def Alorithm_X(A):
+def Alorithm_X(A: ColumnObject):
     """
     Algorithm X as described by Don Knuth, paper here:
         https://arxiv.org/pdf/cs/0011047.pdf
