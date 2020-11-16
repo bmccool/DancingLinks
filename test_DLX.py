@@ -1,9 +1,9 @@
-from DoublyLinkedList import DataObject, ColumnHeader, ColumnObject
+from DLX import DataObject, ColumnHeader, DLXObject
 import pytest
 
 @pytest.fixture
 def fig_2():
-    fig2 = ColumnObject()
+    fig2 = DLXObject()
     fig2.add_row([0, 0, 1, 0, 1, 1, 0]) #TODO This guy is not updating ColumnHeader('C').D
     fig2.add_row([1, 0, 0, 1, 0, 0, 1])
     fig2.add_row([0, 1, 1, 0, 0, 1, 0])
@@ -12,7 +12,7 @@ def fig_2():
     fig2.add_row([0, 0, 0, 1, 1, 0, 1])
     yield fig2
 
-def check_row(matrix: ColumnObject, labels, depth):
+def check_row(matrix: DLXObject, labels, depth):
     if len(labels) == 0:
         return True
     else:
@@ -39,7 +39,7 @@ def check_row(matrix: ColumnObject, labels, depth):
             assert header_index.C.N == label
             header_index = header_index.L
 
-def check_fig_2_whole(fig_2: ColumnObject):
+def check_fig_2_whole(fig_2: DLXObject):
     # Check Labels (names)
     header_index = fig_2.root
     row = [header_index.N] # Get the first one
@@ -69,7 +69,7 @@ def check_fig_2_whole(fig_2: ColumnObject):
     # Check Row 6
     check_row(fig_2, ['D', 'E', 'G'], 3)    
 
-def check_fig_2_cover_a(fig_2: ColumnObject):
+def check_fig_2_cover_a(fig_2: DLXObject):
     # Check Labels (names)
     header_index = fig_2.root
     row = [header_index.N] # Get the first one
@@ -99,10 +99,10 @@ def check_fig_2_cover_a(fig_2: ColumnObject):
     # Check Row 6
     check_row(fig_2, ['D', 'E', 'G'], 1)    
 
-def test_fig_2_creation(fig_2):
+def test_DLX_creation_fig_2(fig_2):
     check_fig_2_whole(fig_2)
 
-def test_fig_2_removal(fig_2):
+def test_DLX_removal_fig_2(fig_2):
     header_index = fig_2.root
 
     # Remove header A horiz
@@ -123,7 +123,7 @@ def test_fig_2_removal(fig_2):
 
     check_fig_2_cover_a(fig_2)
 
-def test_fig_2_restore(fig_2):
+def test_DLX_restore_fig_2(fig_2):
     remove_index = fig_2.root
 
     # Remove header A horiz
@@ -198,6 +198,7 @@ def test_DLX_search_fig_2(fig_2):
     assert fig_2.solution[0] == ["A", "D"]
     assert fig_2.solution[1] == ["E", "F", "C"]
     assert fig_2.solution[2] == ["B", "G"]
+    assert len(fig_2.solution) == 3
     # This shows that fig 2 has an exact cover with:
     #    Row 4(A,D)
     #    Row 1(C, E, F)
