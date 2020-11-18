@@ -4,7 +4,7 @@ import pytest
 @pytest.fixture
 def fig_2():
     fig2 = DLXObject()
-    fig2.add_row([0, 0, 1, 0, 1, 1, 0]) #TODO This guy is not updating ColumnHeader('C').D
+    fig2.add_row([0, 0, 1, 0, 1, 1, 0]) #TODO This guy is not updating ColumnHeader( '3').D
     fig2.add_row([1, 0, 0, 1, 0, 0, 1])
     fig2.add_row([0, 1, 1, 0, 0, 1, 0])
     fig2.add_row([1, 0, 0, 1, 0, 0, 0])
@@ -46,7 +46,7 @@ def check_fig_2_whole(fig_2: DLXObject):
     while header_index.R != fig_2.root:
         header_index = header_index.R
         row.append(header_index.N)
-    assert row == ['h', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
+    assert row == ['h', '0', '1', '2', '3', '4', '5', '6']
 
     # Check Sizes
     header_index = fig_2.root
@@ -57,17 +57,17 @@ def check_fig_2_whole(fig_2: DLXObject):
     assert row == [7, 2, 2, 2, 3, 2, 2, 3]
 
     # Check Row 1
-    check_row(fig_2, ['C', 'E', 'F'], 1)
+    check_row(fig_2, [ '2', '4', '5'], 1)
     # Check Row 2
-    check_row(fig_2, ['A', 'D', 'G'], 1)
+    check_row(fig_2, ['0', '3', '6'], 1)
     # Check Row 3
-    check_row(fig_2, ['B', 'C', 'F'], 1)
+    check_row(fig_2, ['1', '2', '5'], 1)
     # Check Row 4
-    check_row(fig_2, ['A', 'D'], 2)
+    check_row(fig_2, ['0', '3'], 2)
     # Check Row 5
-    check_row(fig_2, ['B', 'G'], 2)
+    check_row(fig_2, ['1', '6'], 2)
     # Check Row 6
-    check_row(fig_2, ['D', 'E', 'G'], 3)    
+    check_row(fig_2, ['3', '4', '6'], 3)    
 
 def check_fig_2_cover_a(fig_2: DLXObject):
     # Check Labels (names)
@@ -76,7 +76,7 @@ def check_fig_2_cover_a(fig_2: DLXObject):
     while header_index.R != fig_2.root:
         header_index = header_index.R
         row.append(header_index.N)
-    assert row == ['h', 'B', 'C', 'D', 'E', 'F', 'G']
+    assert row == ['h', '1', '2', '3', '4', '5', '6']
 
     # Check Sizes
     header_index = fig_2.root
@@ -87,17 +87,17 @@ def check_fig_2_cover_a(fig_2: DLXObject):
     assert row == [6, 2, 2, 1, 2, 2, 2]
 
     # Check Row 1
-    check_row(fig_2, ['C', 'E', 'F'], 1)
+    check_row(fig_2, [ '2', '4', '5'], 1)
     # Check Row 2 BUT COL A IS GONE
-    # check_row(fig_2, ['A'], 1)
+    # check_row(fig_2, ['1'], 1)
     # Check Row 3
-    check_row(fig_2, ['B', 'C', 'F'], 1)
+    check_row(fig_2, ['1', '2', '5'], 1)
     # Check Row 4 # BUT COL A IS GONE
-    #check_row(fig_2, ['A'], 2)
+    #check_row(fig_2, ['1'], 2)
     # Check Row 5
-    check_row(fig_2, ['B', 'G'], 2)
+    check_row(fig_2, ['1', '6'], 2)
     # Check Row 6
-    check_row(fig_2, ['D', 'E', 'G'], 1)    
+    check_row(fig_2, ['3', '4', '6'], 1)    
 
 def test_DLX_creation_fig_2(fig_2):
     check_fig_2_whole(fig_2)
@@ -195,11 +195,25 @@ def test_DLX_uncover_fig_2(fig_2):
 
 def test_DLX_search_fig_2(fig_2):
     fig_2.search(0)
-    assert fig_2.solution[0] == ["A", "D"]
-    assert fig_2.solution[1] == ["E", "F", "C"]
-    assert fig_2.solution[2] == ["B", "G"]
+    assert fig_2.solution[0] == ['0', '3']
+    assert fig_2.solution[1] == ['4', '5', '2']
+    assert fig_2.solution[2] == ['1', '6']
     assert len(fig_2.solution) == 3
     # This shows that fig 2 has an exact cover with:
-    #    Row 4(A,D)
-    #    Row 1(C, E, F)
-    #    Row 5(B, G)
+    #    Row 4['0', '3']
+    #    Row 1['4', '5', '2']
+    #    Row 5['1', '6']
+
+def test_DLX_given_1(fig_2):
+    fig_2.given(['0', '3'])
+    fig_2.search(0)
+    assert fig_2.solution[0] == ['4', '5', '2']
+    assert fig_2.solution[1] == ['1', '6']
+    assert len(fig_2.solution) == 2
+
+def test_DLX_given_2(fig_2):
+    fig_2.given(['0', '3'])
+    fig_2.given(['4', '5', '2'])
+    fig_2.search(0)
+    assert fig_2.solution[0] == ['1', '6']
+    assert len(fig_2.solution) == 1

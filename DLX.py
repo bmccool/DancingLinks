@@ -75,10 +75,25 @@ class DLXObject():
         self.root.N = 'h'
         self.root.L = self.root
         self.root.R = self.root
-        self.O = []
+        self.O = [] #TODO what does O represent?  Output? 
         self.solution = None
 
-    def print_solution(self):
+    def given(self, constraints: list):
+        """
+        This function will cover all the constraints listed, which can be
+        thought of as starting with a 'given' choice that is already done
+        """
+        # Make sure constraints are strings that can match the header names
+        for i,e in enumerate(constraints):
+            constraints[i] = str(e)
+        header_index = self.root.R
+        while header_index != self.root:
+            if header_index.N in constraints:
+                header_index.cover()
+            header_index = header_index.R
+
+
+    def get_solution(self):
         rows = []
         for O in self.O:
             columns = [O.C.N]
@@ -86,13 +101,13 @@ class DLXObject():
             while i != O:
                 columns.append(i.C.N)
                 i = i.R
-            print(columns)
+            #print(columns)
             rows.append(columns)
         self.solution = rows
         # Storing the solution here will only store the "last" solution found
         # If we are interested in "all" solutions, this will need to be changed
 
-    def search(self, k):
+    def search(self, k=0, stop=False):
         """
         Our nondeterministic algorithm to find all exact covers can now be cast in the following
         explicit, deterministic form as a recursive procedure search(k), which is invoked initially
@@ -100,8 +115,9 @@ class DLXObject():
         """
         # If R[h] = h, print the current solution (see below) and return.
         if self.root.R == self.root:
-            self.print_solution()
-            return
+            print("FOUND A SOLUTION")
+            self.get_solution()
+            return True
         
         # Find the column c with the least number of 1s (smallest size (S))
         c = self.root.R
@@ -123,6 +139,7 @@ class DLXObject():
                 self.O[k] = r
             except:
                 self.O.append(r)
+                #TODO if we want to track choices as they are done, we just added choice r to self.O
 
             # for each j ← R[r], R[R[r]], . . . , while j != r,
             j = r.R
@@ -132,7 +149,10 @@ class DLXObject():
                 j = j.R
 
             # search(k + 1);
-            self.search(k + 1)
+            retval = self.search(k + 1, stop)
+            # If we want to stop after the first solution...
+            if retval and stop:
+                return True
 
             # set r ← Ok and c ← C[r];
             # TODO, these should already be set, right?
@@ -150,6 +170,7 @@ class DLXObject():
 
         #Uncover column c (see below) and return.
         c.uncover()
+        return False
 
     # In this context, a row represents a subset that can be part of the solution
     # We will focus on adding rows, because a single row has meaning, whereas a single
@@ -219,10 +240,11 @@ class DLXObject():
     def get_next_name(self, header):
         # 1st case
         if header.L == self.root:
-            return("A")
+            return("0")
         else:
             prev_name = header.L.N
-            return(chr(ord(prev_name) + 1))
+            #return(chr(ord(prev_name) + 1))
+            return(str(int(prev_name) + 1))
             # TODO handle cases greater than z
             #if prev_name[-1] == "Z":
             #    try:
