@@ -115,7 +115,6 @@ class DLXObject():
         """
         # If R[h] = h, print the current solution (see below) and return.
         if self.root.R == self.root:
-            print("FOUND A SOLUTION")
             self.get_solution()
             return True
         

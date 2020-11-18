@@ -60,7 +60,6 @@ class Sudoku(DLXObject):
         self.given(constraints)
 
         # Add the clue to our state
-        print("Adding state ({}, {}, {})".format(clue[0], clue[1], clue[2]))
         self.state[clue[0] - 1][clue[1] - 1] = clue[2]
 
     def print_state(self):
@@ -214,7 +213,6 @@ def blank_sudoku(sudoku: DLXObject=None) -> DLXObject:
                 col = 1
                 row = row + 1
                 if row == 10:
-                    print("Row is 10, i == {}".format(i))
                     break
     return sudoku
     
