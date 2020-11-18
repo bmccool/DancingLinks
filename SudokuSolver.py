@@ -1,21 +1,29 @@
+""" 
+'sudoko' means a 2d list (left to right, top to bottom) 9x9.
+'dlx' means a representation in which there are 324 contraints (headers)
+and 729 rows representing each possible location/value combination
+Explained:
+Each row must have 9 values in it and there are 9 rows       81
+Each column must have 9 values in it and there are 9 columns 81
+Each box must have 9 values in it and there are 9 boxes      81
+Each cell must have a value in it and there are 9x9 cells  + 81 = 324 constraints
+9 possible row locations, 
+9 possible column locations, 
+9 possible values = 729 possible placements
+    
+So what we really need is a mapping of 'There's a 7 in row,col==(2,3)' to 
+each of the constraints it fulfills.
+
+We should pick a coordinate convention for the suduko puzzle.  It shouldn't
+matter but we will call rows top to bottom, columns left to right.  Cells
+then are numbered left to right, top to bottom, like a book.
+
+Our interface into dlx is feeding rows at a time represented as a list with 0s
+and 1s.  This is obviously not great, so we'll need a helper function to 
+create that list by passing the indexes of the contsraints and spitting out
+the row.  TODO maybe we should modify dlx to take this 'indexed' format too?
+"""
 from DLX import DLXObject
-
-rows = [
-    " 42 3   1",
-    "856  7   ",
-    "  1 2  4 ",
-    " 6927 48",
-    "  4   2  ",
-    " 83 4156 ",
-    " 1  8 3  ",
-    "   1  724",
-    "6   9 15 ",
-
-]
-
-problem_1 = [
-    [' ', '4', '2', ' ', '3', ]
-]
 
 class Sudoku(DLXObject):
     """
@@ -71,37 +79,6 @@ class Sudoku(DLXObject):
             print(line)
             if (index % 3) == 2:
                  print("+-----+-----+-----+")
-
-
-
-def sudoku_to_dlx(rows: list):
-    """ 
-    'sudoko' means a 2d list (left to right, top to bottom) 9x9.
-    'dlx' means a representation in which there are 324 contraints (headers)
-    and 729 rows representing each possible location/value combination
-    Explained:
-    Each row must have 9 values in it and there are 9 rows       81
-    Each column must have 9 values in it and there are 9 columns 81
-    Each box must have 9 values in it and there are 9 boxes      81
-    Each cell must have a value in it and there are 9x9 cells  + 81 = 324 constraints
-    9 possible row locations, 
-    9 possible column locations, 
-    9 possible values = 729 possible placements
-    
-    So what we really need is a mapping of 'There's a 7 in row,col==(2,3)' to 
-    each of the constraints it fulfills.
-
-    We should pick a coordinate convention for the suduko puzzle.  It shouldn't
-    matter but we will call rows top to bottom, columns left to right.  Cells
-    then are numbered left to right, top to bottom, like a book.
-
-    Our interface into dlx is feeding rows at a time represented as a list with 0s
-    and 1s.  This is obviously not great, so we'll need a helper function to 
-    create that list by passing the indexes of the contsraints and spitting out
-    the row.  TODO maybe we should modify dlx to take this 'indexed' format too?
-
-    """
-    return
 
 def get_constraints_from_point(point):
     row = point[0]
@@ -161,7 +138,7 @@ def get_point_from_constraint(constraint):
     # cell will tell us the location
     row_index = constraint[0]
     col_index = constraint[1]
-    box_index = constraint[2]
+    # box_index = constraint[2] # TODO unused
     cell_index = constraint[3]
 
     # Cell constraints - Only one thing in any given box
